@@ -2,6 +2,8 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import ReactDOM from 'react-dom';
 import {BrowserRouter as Router, Route} from 'react-router-dom';
+import { withRouter } from 'react-router';
+import { Redirect } from 'react-router'
 import { Provider, connect } from 'react-redux';
 import { Form, FormGroup, NavItem, Input, Button } from 'reactstrap';
 import api from '../api';
@@ -53,13 +55,14 @@ let Signup = connect(({signup}) => {return {signup};})((props) => {
   }
 
   function create_signup(ev) {
-    api.submit_signup(props.signup);
+    api.submit_signup(props.signup).
     console.log(props.signup);
+
   }
 
   return <div className="card" style={{width: '60%', marginLeft: '20%'}}>
     <div className="card-header">
-    <h4> Sign Up</h4> 
+      <h4> Sign Up</h4>
     </div>
     <div className="card-body">
       <Form >
@@ -86,6 +89,11 @@ let Session = connect(({token}) => {return {token};})((props) => {
   console.log(props.token);
   return <div className="navbar-text">
     Welcome, { props.token.user_name }
+    <ul className="navbar-nav mr-auto">
+      <NavItem>
+        <NavLink to=" " exact={true} className="nav-link">Logout</NavLink>
+      </NavItem>
+    </ul>
   </div>;
 });
 
@@ -93,6 +101,7 @@ function Nav(props) {
   let session_info;
   let create_task;
   let show_links;
+  let show_signup;
 
 
   if (props.token) {
@@ -154,24 +163,25 @@ function Nav(props) {
                   <h1 style={{padding : '5% 38% 0%'}}> Welcome to Tasktracker</h1>
                   <h3 style={{padding : '0% 40% 0%'}}> Login or Signup to begin</h3>
                 </div>
-              }
+                show_signup =   <Route path="/signup" exact={true} render={() =>
+                    <Signup />
+                  }/>
+                }
 
-              return (
-                <Router>
-                  <div>
-                    <nav className="navbar navbar-light bg-old navbar-expand">
-                      <span className="navbar-brand brand">
-                        Tasktracker
-                      </span>
-                      { show_links }
+                return (
+                  <Router>
+                    <div>
+                      <nav className="navbar navbar-light bg-old navbar-expand">
+                        <span className="navbar-brand brand">
+                          Tasktracker
+                        </span>
+                        { show_links }
 
 
-                      { session_info }
-                    </nav>
-                    { create_task }
-                    <Route path="/signup" exact={true} render={() =>
-                        <Signup />
-                      }/>
+                        { session_info }
+                      </nav>
+                      { create_task }
+                      { show_signup }
                     </div></Router>
                   );
                 }
@@ -180,7 +190,8 @@ function Nav(props) {
                   return {
                     token: state.token,
                     users: state.users,
-                    tasks: state.tasks
+                    tasks: state.tasks,
+                    redirect: false
                   };
                 }
 
